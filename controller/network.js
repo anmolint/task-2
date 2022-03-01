@@ -1,13 +1,15 @@
 const mongoose = require("mongoose");
+require('dotenv').config()
+console.log(process.env.mongoUri)
 main()
   .then(() => {})
   .catch((err) => console.log(err));
 async function main() {
-  a = await mongoose.connect(
-    "mongodb+srv://Anmol:baloni@cluster0.v1fvg.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
-  );
-  if (a) {
+  let connection = await mongoose.connect(process.env.mongoUri)
+
+  if (connection) {
     console.log("sucess");
   }
-}
+};
+
 module.exports = main;

@@ -1,4 +1,3 @@
-const { default: async } = require("async");
 const data = require('../model/user')
 const dataReturn = async(req,res)=>{
     try{
@@ -10,7 +9,7 @@ const dataReturn = async(req,res)=>{
       .exec();
         
       const count = await data.countDocuments();
-      res.send(count,posts)
+      res.send(count)
 res.json({
         posts,
         totalPages: Math.ceil(count / limit),

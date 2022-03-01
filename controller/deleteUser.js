@@ -1,12 +1,12 @@
-const { default: async } = require("async");
+require('dotenv').config()
 const data = require('../model/user')
 const jwt = require('jsonwebtoken');
 const delData = async(req,res) =>{
     try{
-        console.log(req.headers)
-        let decoded = jwt.verify(req.headers.id, 'abcd');
-        let a = await data.findOne({_id:decoded.user_id});
-        if(a){
+        
+        let decoded = jwt.verify(req.headers.id, prrocess.env.key);
+        let founduser = await data.findOne({_id:decoded.user_id});
+        if(founduser){
             await data.deleteOne({_id:decoded.user_id});
             res.send('data deleted')
         }else{console.log('data does not exist')}
