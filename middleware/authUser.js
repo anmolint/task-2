@@ -4,7 +4,7 @@ const tokenVerification = async (req, res, next) => {
   try {
     const tkn = req.headers.authorization;
     if(!tkn){
-      res.send(gettoken)
+      res.send(" auth token required")
     }
     else{
     let decode = jwt.verify(tkn, process.env.key);
