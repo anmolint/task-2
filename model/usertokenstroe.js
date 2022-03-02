@@ -2,8 +2,13 @@ const mongoose =require("mongoose");
 const {Schema} =mongoose;
 const tokenauth = new Schema([
     {
-        userid:"string",
-        access_token :{type:"string",expires:3600}
+        userid:"String",
+        access_token : "String",
+        expires: {
+            type: Date,
+            default: Date.now,
+            expires: 3600
+          }
 
     }
 ])
