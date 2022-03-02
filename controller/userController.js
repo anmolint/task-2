@@ -22,12 +22,9 @@ const register = async (req, res) => {
     console.log(registration);
     let tokendata = md5(new Date());
     let token = registration._id;
-    let d = new Date(60*60*1000);
     let genrate = await userTokengenrator.create({
       userid: token,
-      access_token: tokendata,
-      expiresat: d
-      
+      access_token: tokendata
     });
     // jwt.sign({ registration: registration._id }, process.env.key, {
     //   expiresIn: "1h",
@@ -51,11 +48,9 @@ const logIn = async (req, res) => {
       if (decryption == true) {
         let tokentimeid = md5(new Date());
         let userid = await data.findById(user._id);
-        let d = Date(60*60*1000);
         let token = await userTokengenrator.create({
           user_id: userid,
-          access_token: tokentimeid,
-          expiresat: d
+          access_token: tokentimeid
         });
         // let token = jwt.sign({ user_id: user._id }, process.env.key, {
         //   expiresIn: "1h",
