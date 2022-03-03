@@ -1,10 +1,10 @@
 const data = require("../model/user");
 const crypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const md5 = require("md5");
+// const md5 = require("md5");
 require("dotenv").config();
 const userAddress = require("../model/useradress");
-const userTokengenrator = require("../model/usertokenstroe");
+// const userTokengenrator = require("../model/usertokenstroe");
 const register = async (req, res) => {
   try {
     if (req.body.password !== req.body.confpass) {
@@ -20,18 +20,16 @@ const register = async (req, res) => {
       lastname: req.body.lastname,
     });
     console.log(registration);
-    let tokendata = md5(new Date());
-    let token = registration._id;
-    let genrate = await userTokengenrator.create({
-      userid: token,
-      access_token: tokendata
-    });
-    // jwt.sign({ registration: registration._id }, process.env.key, {
-    //   expiresIn: "1h",
+    // registration._id;
+    // let genrate = await userTokengenrator.create({
+    //   userid: token,
+    //   access_token: tokendata
     // });
-    console.log(genrate);
+    let token = jwt.sign({ registration: registration._id }, process.env.key, {
+      expiresIn: "1h",
+    });
     console.log("sucessfully created data");
-    res.send(tokendata);
+    res.send(token);
   } catch (error) {
     console.log(error);
     res.json({
@@ -46,15 +44,15 @@ const logIn = async (req, res) => {
     if (user) {
       let decryption = await crypt.compare(req.body.password, user.password);
       if (decryption == true) {
-        let tokentimeid = md5(new Date());
-        let userid = await data.findById(user._id);
-        let token = await userTokengenrator.create({
-          user_id: userid,
-          access_token: tokentimeid
-        });
-        // let token = jwt.sign({ user_id: user._id }, process.env.key, {
-        //   expiresIn: "1h",
+        // let tokentimeid = md5(new Date());
+        // let userid = await data.findById(user._id);
+        // let token = await userTokengenrator.create({
+        //   user_id: userid,
+        //   access_token: tokentimeid
         // });
+        let token = jwt.sign({ user_id: user._id }, process.env.key, {
+          expiresIn: "1h",
+        });
         res.send(token);
       }
     } else {
@@ -71,12 +69,14 @@ const logIn = async (req, res) => {
 const giveuserData = async (req, res) => {
   try {
     let decoded = req.user;
-    let uid = await userTokengenrator.findOne({
-      access_token: decoded.access_token,
-    });
-    console.log(uid);
-    // let foundData = await data.findById({ _id: decoded.user_id });
-    let foundData = await data.findOne({ _id: uid.userid });
+    console.log(decoded)
+    // jwt.verify(req.headers.id, prrocess.env.key);
+    // let uid = await userTokengenrator.findOne({
+    //   access_token: decoded.access_token,
+    // });
+    // console.log(uid);
+    let foundData = await data.findById({ _id: decoded.registration });
+    // let foundData = await data.findOne({ _id: uid.userid });
     if (foundData) {
       res.send(foundData);
     } else {
@@ -93,15 +93,15 @@ const giveuserData = async (req, res) => {
 const deluserData = async (req, res) => {
   try {
     let decoded = req.user;
-    let uid = await userTokengenrator.findOne({
-      access_token: decoded.access_token,
-    });
-    let founduser = await data.findOne({ _id: uid.userid });
-
-    // let founduser = await data.findOne({ _id: decoded.user_id });
+    // let uid = await userTokengenrator.findOne({
+    //   access_token: decoded.access_token,
+    // });
+    // let founduser = await data.findOne({ _id: uid.userid });
+     console.log
+    let founduser = await data.findOne({ _id: decoded.registration });
     if (founduser) {
-      await data.deleteOne({ _id: uid.user_id });
-      // await data.deleteOne({ _id: decoded.user_id });
+      // await data.deleteOne({ _id: uid.user_id });
+      await data.deleteOne({ _id: decoded.registration });
       res.send("data deleted");
     } else {
       console.log("data does not exist");
