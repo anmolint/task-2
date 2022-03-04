@@ -1,4 +1,4 @@
-const data = require("../model/user");
+const db= require("../model/index");
 const crypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const multer =require("../middleware/multer")
@@ -15,7 +15,7 @@ const register = async (req, res) => {
     }
     let saltRounds = await crypt.genSalt(10);
     let encrypt = await crypt.hashSync(req.body.password, saltRounds);
-    let registration = await data.create({
+    let registration = await db.userregister.create({
       username: req.body.username,
       password: encrypt,
       email: req.body.email,
@@ -53,7 +53,7 @@ const register = async (req, res) => {
 };
 const logIn = async (req, res) => {
   try {
-    let user = await data.findOne({ username: req.body.username });
+    let user = await db.userregister.findOne({ username: req.body.username });
     if (user) {
       let decryption = await crypt.compare(req.body.password, user.password);
       if (decryption == true) {
@@ -77,7 +77,7 @@ const giveuserData = async (req, res) => {
   try {
     let decoded = req.user;
     console.log(decoded);
-    let foundData = await data.findById({ _id: decoded.registration });
+    let foundData = await db.userregister.findById({ _id: decoded.registration });
     if (foundData) {
       res.send(foundData);
     } else {
@@ -94,7 +94,7 @@ const giveuserData = async (req, res) => {
 const deluserData = async (req, res) => {
   try {
     let decoded = req.user;
-    let founduser = await data.findOne({ _id: decoded.registration });
+    let founduser = await db.userregister.findOne({ _id: decoded.registration });
     if (founduser) {
       await data.deleteOne({ _id: decoded.registration });
       res.send("data deleted");
@@ -111,14 +111,14 @@ const deluserData = async (req, res) => {
 };
 const paginateddataReturn = async (req, res) => {
   try {
-    const { page = req.query.id, limit = 10 } = req.query;
-    const posts = await data
+    const { page = req.params.id, limit = 10 } = req.params;
+    if (page<1){page=1}
+    const posts = await db.userregister
       .find()
-      .limit(limit * 1)
+      .limit(limit )
       .skip((page - 1) * limit);
 
-    const count = await data.countDocuments();
-    res.send(count);
+    const count = await db.userregister.countDocuments();
     res.json({
       posts,
       totalPages: Math.ceil(count / limit),
@@ -132,7 +132,7 @@ const addressCreate = async (req, res) => {
   try {
     let uid = req.user;
 
-    let createdadta = await userAddress.create({
+    let createdadta = await db.useraddressdataupdate.create({
       user_id: uid.user_id,
       address: req.body.address,
       city: req.body.city,
@@ -153,13 +153,13 @@ const addressCreate = async (req, res) => {
 const deleteAddress = async (req, res) => {
   try {
     let uid = req.user;
-    let findaddressdata = await userAddress.findOne({
+    let findaddressdata = await db.useraddressdataupdate.findOne({
       user_id: uid.registration,
     });
     if (!findaddressdata) {
       res.send("invalid address");
     } else {
-      await userAddress.deleteOne({ address: findaddressdata.address });
+      await db.useraddressdataupdate.deleteOne({ address: findaddressdata.address });
       res.send("address deleted");
     }
   } catch (error) {
@@ -172,7 +172,7 @@ const deleteAddress = async (req, res) => {
 };
 const passwordResetgenrator = async (req, res) => {
   try {
-    let userdata = await data.findOne({ email: req.body.email });
+    let userdata = await db.userregister.findOne({ email: req.body.email });
     if (!userdata) {
       res.send("please enter valid email");
     } else {
@@ -190,13 +190,13 @@ const passwordResetgenrator = async (req, res) => {
     .then(() => {
       console.log('Email sent')
     })
-      await userTokengenrator.create({
+      await db.userTokendataUpdare.create({
         userid : userdata._id,
         access_token :token
       })
 
 
-      res.send(token);
+      res.send("email sent");
     }
   } catch (error) {
     console.log(error);
@@ -209,7 +209,7 @@ const passwordResetgenrator = async (req, res) => {
 const passwordReset = async (req, res) => {
   try {
     let passreset = req.user;
-    let usercheckauthtoken = await userTokengenrator.findOne({userid:passreset.registration})
+    let usercheckauthtoken = await db.userTokendataUpdare.findOne({userid:passreset.registration})
     if(usercheckauthtoken){
     let saltRounds = await crypt.genSalt(10);
     let passwordNew = await crypt.hashSync(req.body.password, saltRounds);
@@ -226,7 +226,7 @@ const passwordReset = async (req, res) => {
   .then(() => {
     console.log('Email sent')
   })
-     await userTokengenrator.deleteOne({_id:usercheckauthtoken._id})}
+     await db.userTokendataUpdare.deleteOne({_id:usercheckauthtoken._id})}
      else{res.send("token expired")}
   } catch (error) {
     console.log(error);
@@ -246,7 +246,7 @@ const uploadimagedata= async(req,res) =>{
     api_secret: process.env.cloudinary_cloud_api_secret 
   }); 
   let result = await cloudinary.uploader.upload(req.file.path)
-  await data.updateOne({_id:decode.registration},{image:result.secure_url})
+  await db.userregister.updateOne({_id:decode.registration},{image:result.secure_url})
   
   
    }
