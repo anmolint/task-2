@@ -22,7 +22,6 @@ const register = async (req, res) => {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
     });
-    console.log(registration);
     let token = jwt.sign({ registration: registration._id }, process.env.key, {
       expiresIn: "1h",
     });
@@ -190,7 +189,7 @@ const passwordResetgenrator = async (req, res) => {
     .then(() => {
       console.log('Email sent')
     })
-      await db.userTokendataUpdare.create({
+      await db.userTokendataUpdate.create({
         userid : userdata._id,
         access_token :token
       })
@@ -209,7 +208,7 @@ const passwordResetgenrator = async (req, res) => {
 const passwordReset = async (req, res) => {
   try {
     let passreset = req.user;
-    let usercheckauthtoken = await db.userTokendataUpdare.findOne({userid:passreset.registration})
+    let usercheckauthtoken = await db.userTokendataUpdate.findOne({userid:passreset.registration})
     if(usercheckauthtoken){
     let saltRounds = await crypt.genSalt(10);
     let passwordNew = await crypt.hashSync(req.body.password, saltRounds);
@@ -226,7 +225,7 @@ const passwordReset = async (req, res) => {
   .then(() => {
     console.log('Email sent')
   })
-     await db.userTokendataUpdare.deleteOne({_id:usercheckauthtoken._id})}
+     await db.userTokendataUpdate.deleteOne({_id:usercheckauthtoken._id})}
      else{res.send("token expired")}
   } catch (error) {
     console.log(error);

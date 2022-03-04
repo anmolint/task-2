@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const data_value = new Schema([
+const userregistration = new Schema([
   {
     username: { type: "string", unique: true },
     password: "string",
@@ -11,5 +11,5 @@ const data_value = new Schema([
     image:"string"
   },
 ]);
-const datavalue = mongoose.model("dbData", data_value);
+const datavalue = mongoose.model("dbData", userregistration);
 module.exports = datavalue;
