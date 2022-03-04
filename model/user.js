@@ -8,6 +8,7 @@ const data_value = new Schema([
     email: { type: "string", unique: true },
     firstname: "string",
     lastname: "string",
+    image:"string"
   },
 ]);
 const datavalue = mongoose.model("dbData", data_value);
